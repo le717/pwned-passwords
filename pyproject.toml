@@ -1,0 +1,82 @@
+[tool.poetry]
+name = "pwned-passwords"
+version = "1.0.0"
+description = "Pwned Passwords API wrapper"
+authors = ["Caleb <le717@users.noreply.github.com>"]
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/le717/pwned-passwords"
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Web Environment",
+  "Intended Audience :: Information Technology",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Internet :: WWW/HTTP",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development :: Version Control :: Git",
+  "Typing :: Typed",
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+httpx = "^0.26.0"
+pyspnego = "^0.10.2"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.8"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+# Tool configuration
+line-length = 100
+
+# Linting rules
+select = [
+  "C90",    # mccabe
+  "D",      # pydocstyle
+  "E",      # pycodestyle
+  "W",      # pycodestyle
+  "ERA",    # eradicate
+  "F",      # pyflakes
+  "FIX",    # flake8-fixme
+  "I",      # isort
+  "RET",    # flake8-return
+  "RUF200", # ruff invalid-pyproject-toml
+  "SIM",    # flake8-simplify
+  "UP",     # pyupgrade
+]
+
+ignore = [
+  "D100", # undocumented-public-module
+  "D104", # undocumented-public-package
+  "D203", # one-blank-line-before-class
+  "D213", # multi-line-summary-second-line
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Turn off some rules for tests
+"tests/*.py" = [
+  "D", # pydocstyle
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+preview = true
+
+[tool.ruff.isort]
+# Match isort profile=black for blank lines after imports
+lines-after-imports = 2
+
+# ruff doesn't (yet?) treat zoneinfo as part of the stdlib
+extra-standard-library = ["zoneinfo"]
+
+[tool.ruff.mccabe]
+max-complexity = 10
