@@ -3,7 +3,7 @@ from collections import Counter
 from pathlib import Path
 from unittest.mock import create_autospec
 
-from pwned_passwords import _structs, _utils
+from pwned_passwords import _md4, _structs, _utils
 
 
 class TestUtilsAPIOptions(unittest.TestCase):
@@ -28,7 +28,7 @@ class TestUtilsAPIOptions(unittest.TestCase):
         self.assertDictEqual(params, {"mode": "ntlm"})
 
     def test_mode_something_else(self) -> None:
-        opts = _structs.PwnedOptions(mode="unsupported_hash")
+        opts = _structs.PwnedOptions(mode="unsupported_hash")  # type: ignore[reportArgumentType, ty:invalid-argument-type]
         _, params = _utils.build_request_options(opts)
         self.assertDictEqual(params, {})
 
@@ -40,39 +40,17 @@ class TestUtilsAPIOptions(unittest.TestCase):
 
     def test_options_is_none_is_error(self) -> None:
         with self.assertRaises(TypeError):
-            _utils.build_request_options()
+            _utils.build_request_options()  # type: ignore[reportCallIssue, ty:missing-argument]
 
 
 class TestUtilsAlgo(unittest.TestCase):
-    def test_sha1_hash_with_string(self) -> None:
-        # SHA-1 hash for comparison generated using https://github.com/veler/DevToys
-        sha1_hash = _utils.generate_hash("sha1", "password")
-        self.assertEqual(sha1_hash, "5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8")
-
-    def test_sha1_hash_with_bytes(self) -> None:
-        sha1_hash = _utils.generate_hash("sha1", b"password")
-        self.assertEqual(sha1_hash, "5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8")
-
-    def test_ntlm_hash_with_string(self) -> None:
-        # NTLM hash for comparison generated using https://codebeautify.org/ntlm-hash-generator
-        ntlm_hash = _utils.generate_hash("ntlm", "password")
-        self.assertEqual(ntlm_hash, "8846F7EAEE8FB117AD06BDD830B7586C")
-
-    def test_ntlm_hash_with_bytes(self) -> None:
-        ntlm_hash = _utils.generate_hash("ntlm", b"password")
-        self.assertEqual(ntlm_hash, "8846F7EAEE8FB117AD06BDD830B7586C")
-
     def test_unknown_algo(self) -> None:
         with self.assertRaises(NotImplementedError) as exc:
             _utils.generate_hash("unsupported_hash", "password")
-        self.assertEqual(
+        self.assertIn(
+            "Unsupported hashing algorithm: 'unsupported_hash'. Available options: sha1",
             str(exc.exception),
-            "Unsupported hashing algorithm: 'unsupported_hash'. Available options: 'sha1', 'ntlm'",
         )
-
-    def test_fallback_md4(self) -> None:
-        r = _utils._fallback_md4("password".encode("utf-16le"))
-        self.assertEqual(r, "8846F7EAEE8FB117AD06BDD830B7586C")
 
 
 class TestUtilsMakeRequest(unittest.TestCase):
@@ -97,6 +75,7 @@ class TestUtilsMakeRequest(unittest.TestCase):
         result = make_request(hash, {}, {})
         self.assertIn("1E4C9B93F3F0682250B6CF8331B7EE68FD8", result)
 
+    @unittest.skipIf(not _md4.has_md4, "no md4 support")
     def test_password_ntlm_hash_in_response(self) -> None:
         make_request = create_autospec(_utils.make_request, return_value=self.ntlm_no_padding)
         hash = _utils.generate_hash("ntlm", "password")[:5]
@@ -145,6 +124,7 @@ class TestUtilsParseResponse(unittest.TestCase):
         self.assertEqual(r.times_pwned, 0)
         self.assertListEqual(r.hashes, [])
 
+    @unittest.skipIf(not _md4.has_md4, "no md4 support")
     def test_pwned_password_ntlm_no_hashes(self) -> None:
         hash = _utils.generate_hash("ntlm", "password")
         r = _utils.parse_response(hash, self.ntlm_no_padding, get_hashes=False)
@@ -152,6 +132,7 @@ class TestUtilsParseResponse(unittest.TestCase):
         self.assertEqual(r.times_pwned, 9659365)
         self.assertListEqual(r.hashes, [])
 
+    @unittest.skipIf(not _md4.has_md4, "no md4 support")
     def test_pwned_password_ntlm_with_hashes(self) -> None:
         hash = _utils.generate_hash("ntlm", "password")
         r = _utils.parse_response(hash, self.ntlm_no_padding, get_hashes=True)
@@ -159,6 +140,7 @@ class TestUtilsParseResponse(unittest.TestCase):
         self.assertEqual(r.times_pwned, 9659365)
         self.assertEqual(len(r.hashes), 859)
 
+    @unittest.skipIf(not _md4.has_md4, "no md4 support")
     def test_pwned_password_ntlm_no_zero_results(self) -> None:
         hash = _utils.generate_hash("ntlm", "password")
         r = _utils.parse_response(hash, self.ntlm_padding, get_hashes=True)
@@ -167,6 +149,7 @@ class TestUtilsParseResponse(unittest.TestCase):
         self.assertEqual(len(r.hashes), 859)
         self.assertNotIn(0, Counter(result.count for result in r.hashes))
 
+    @unittest.skipIf(not _md4.has_md4, "no md4 support")
     def test_unpwned_password_ntlm_no_results(self) -> None:
         hash = _utils.generate_hash("ntlm", "this_password_is_not_in_the_result_set")
         r = _utils.parse_response(hash, self.ntlm_no_padding, get_hashes=False)

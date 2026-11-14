@@ -1,4 +1,4 @@
-from typing import NamedTuple
+from typing import Literal, NamedTuple
 
 
 __all__ = ["PwnedHash", "PwnedOptions", "PwnedResults"]
@@ -15,7 +15,7 @@ class PwnedOptions(NamedTuple):
     """Pwned Passwords API options."""
 
     add_padding: bool = False
-    mode: str = "sha1"
+    mode: Literal["sha1", "ntlm"] = "sha1"
 
     # Library-specific option
     get_hashes: bool = False

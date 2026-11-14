@@ -4,10 +4,10 @@ from . import _utils
 from ._structs import PwnedHash, PwnedOptions, PwnedResults
 
 
-__all__ = ["check", "check_async", "PwnedHash", "PwnedOptions", "PwnedResults"]
+__all__ = ["PwnedHash", "PwnedOptions", "PwnedResults", "check"]
 
 
-def check(password: bytes | str, /, options: PwnedOptions | None = None) -> PwnedResults:
+def check(password: bytes | str, /, *, options: PwnedOptions | None = None) -> PwnedResults:
     """Check a password against the Pwned Passwords API.
 
     https://haveibeenpwned.com/API/v3#PwnedPasswords

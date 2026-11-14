@@ -1,19 +1,12 @@
 import hashlib
-from typing import NoReturn
 
 import httpx
-from spnego._ntlm_raw.md4 import md4
 
+from . import _md4
 from ._structs import PwnedHash, PwnedOptions, PwnedResults
 
 
 __all__ = ["build_request_options", "generate_hash", "make_request", "parse_response"]
-
-
-def _fallback_md4(value: bytes) -> str:
-    """Generate an md4 hash using pyspengo."""
-    # TIL about the existence of `bytes.hex() -> str`
-    return md4(value).hex().upper()
 
 
 def build_request_options(options: PwnedOptions, /) -> tuple[dict[str, str], dict[str, str]]:
@@ -32,34 +25,36 @@ def build_request_options(options: PwnedOptions, /) -> tuple[dict[str, str], dic
     # according to the API docs
     if options.mode == "ntlm":
         params["mode"] = "ntlm"
-
     return (headers, params)
 
 
-def generate_hash(hash_type: str, password: str, /) -> str | NoReturn:
+def generate_hash(hash_type: str, password: bytes | str, /) -> str:
     """Generate a hash of the specified type for the given value."""
     # Generate an SHA-1 hash
     if hash_type == "sha1":
         if isinstance(password, str):
-            password = password.encode()
+            password = password.encode("utf-8")
         return hashlib.sha1(password).hexdigest().upper()
 
-    # Generate an NTLM hash
-    # https://stackoverflow.com/questions/15603628/how-to-calculate-ntlm-hash-in-python#comment56664902_15603809  # noqa
+    # Generate an NTLM hash, if we have the MD4 algo available
+    # https://stackoverflow.com/questions/15603628/how-to-calculate-ntlm-hash-in-python#comment56664902_15603809
     if hash_type == "ntlm":
         # If we got bytes, convert it back to a string before making it a specific type of bytes
         if isinstance(password, bytes):
-            password = password.decode()
+            password = password.decode("utf-8")
         password = password.encode("utf-16le")
 
-        # If the MD4 algo is not available via hashlib, we need to fallback to pyspnego
-        if "md4" not in hashlib.algorithms_available:
-            return _fallback_md4(password)
-        return hashlib.new("md4", password).hexdigest().upper()
+        # Use whatever MD4 algo we have available to us, if there even is one.
+        # If not, this will raise an exception
+        return _md4.md4(password)
 
-    # We don't support that algo
+    # We don't support the request algo, determine which ones we do support so we can provide
+    # an accurate exception message
+    algos = ["sha1"]
+    if _md4.has_md4:
+        algos.append("ntlm")
     raise NotImplementedError(
-        f"Unsupported hashing algorithm: {hash_type!r}. Available options: 'sha1', 'ntlm'"
+        f"Unsupported hashing algorithm: {hash_type!r}. Available options: {', '.join(algos)}."
     )
 
 
