@@ -34,6 +34,7 @@ print(result.hashes)  # list[pwned_passwords.PwnedHash]
 
 **Note**: NTLM hash support is dependent on platform support, with fallback support provided by
 [pyspnego](https://pypi.org/project/pyspnego/) if installed with the `[ntlm]` extra group.
+If no NTLM support is available, `pwned_passwords.exceptions.UnsupportedAlgoError` will be raised.
 It is recommended to stick with the SHA-1 hash default.
 
 

@@ -3,7 +3,7 @@ from collections import Counter
 from pathlib import Path
 from unittest.mock import create_autospec
 
-from pwned_passwords import _md4, _structs, _utils
+from pwned_passwords import _md4, _structs, _utils, exceptions
 
 
 class TestUtilsAPIOptions(unittest.TestCase):
@@ -45,7 +45,7 @@ class TestUtilsAPIOptions(unittest.TestCase):
 
 class TestUtilsAlgo(unittest.TestCase):
     def test_unknown_algo(self) -> None:
-        with self.assertRaises(NotImplementedError) as exc:
+        with self.assertRaises(exceptions.UnsupportedAlgoError) as exc:
             _utils.generate_hash("unsupported_hash", "password")
         self.assertIn(
             "Unsupported hashing algorithm: 'unsupported_hash'. Available options: sha1",

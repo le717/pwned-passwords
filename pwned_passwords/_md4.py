@@ -1,13 +1,15 @@
 import hashlib
 from typing import NoReturn
 
+from .exceptions import UnsupportedAlgoError
+
 
 __all__ = ["has_md4", "md4"]
 
 
 def _no_md4_support(data: bytes, /) -> NoReturn:
     """Raise an exception when trying to use NTLM hashing without md4 hash support."""
-    raise NotImplementedError("Unsupported hashing algorithm: 'ntlm'. Available options: sha1.")
+    raise UnsupportedAlgoError("Unsupported hashing algorithm: 'ntlm'. Available options: sha1.")
 
 
 def _fallback_md4(data: bytes, /) -> str:
@@ -27,7 +29,7 @@ if "md4" in hashlib.algorithms_available:
 else:
     # If it is not in hashlib, fallback to pyspengo
     try:
-        from spnego._ntlm_raw.md4 import md4 as pyspnego_md4
+        from spnego._ntlm_raw.md4 import md4 as pyspnego_md4  # type: ignore[reportMissingImports, ty:import-not-found]
 
         has_md4 = True
 

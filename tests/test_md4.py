@@ -1,6 +1,6 @@
 import unittest
 
-from pwned_passwords import _md4, _utils
+from pwned_passwords import _md4, _utils, exceptions
 
 
 class TestUtilsNtlm(unittest.TestCase):
@@ -20,7 +20,7 @@ class TestUtilsNtlm(unittest.TestCase):
     @unittest.skipIf(_md4.has_md4, "has md4 support")
     def test_no_md4(self) -> None:
         """We do not have md4 support."""
-        with self.assertRaises(NotImplementedError) as exc:
+        with self.assertRaises(exceptions.UnsupportedAlgoError) as exc:
             _md4.md4("password".encode("utf-16le"))
         self.assertEqual(
             str(exc.exception), "Unsupported hashing algorithm: 'ntlm'. Available options: sha1."

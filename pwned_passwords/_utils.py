@@ -4,6 +4,7 @@ import httpx
 
 from . import _md4
 from ._structs import PwnedHash, PwnedOptions, PwnedResults
+from .exceptions import UnsupportedAlgoError
 
 
 __all__ = ["build_request_options", "generate_hash", "make_request", "parse_response"]
@@ -53,7 +54,7 @@ def generate_hash(hash_type: str, password: bytes | str, /) -> str:
     algos = ["sha1"]
     if _md4.has_md4:
         algos.append("ntlm")
-    raise NotImplementedError(
+    raise UnsupportedAlgoError(
         f"Unsupported hashing algorithm: {hash_type!r}. Available options: {', '.join(algos)}."
     )
 
