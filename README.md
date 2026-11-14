@@ -32,7 +32,9 @@ result: pwned_passwords.PwnedResults = pwned_passwords.check(
 print(result.hashes)  # list[pwned_passwords.PwnedHash]
 ```
 
-**Note**: NTLM hash support is dependent on platform support, with fallback support provided by [pyspnego](https://pypi.org/project/pyspnego/). It is recommended to stick with the SHA-1 hash default.
+**Note**: NTLM hash support is dependent on platform support, with fallback support provided by
+[pyspnego](https://pypi.org/project/pyspnego/) if installed with the `[ntlm]` extra group.
+It is recommended to stick with the SHA-1 hash default.
 
 
 ## License
@@ -40,4 +42,4 @@ Pwned Passwords API, created and maintained at [Have I Been Pwned](https://havei
 
 Have I Been Pwned is not affiliated with nor endorses this project.
 
-2023 [MIT](LICENSE)
+2023, 2026 [MIT](LICENSE)
