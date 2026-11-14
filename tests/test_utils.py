@@ -48,7 +48,7 @@ class TestUtilsAlgo(unittest.TestCase):
         with self.assertRaises(exceptions.UnsupportedAlgoError) as exc:
             _utils.generate_hash("unsupported_hash", "password")
         self.assertIn(
-            "Unsupported hashing algorithm: 'unsupported_hash'. Available options: sha1",
+            "Unsupported hashing algorithm: 'unsupported_hash'. Available options: 'sha1'",
             str(exc.exception),
         )
 

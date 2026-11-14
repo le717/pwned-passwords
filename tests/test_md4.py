@@ -23,5 +23,5 @@ class TestUtilsNtlm(unittest.TestCase):
         with self.assertRaises(exceptions.UnsupportedAlgoError) as exc:
             _md4.md4("password".encode("utf-16le"))
         self.assertEqual(
-            str(exc.exception), "Unsupported hashing algorithm: 'ntlm'. Available options: sha1."
+            str(exc.exception), "Unsupported hashing algorithm: 'ntlm'. Available options: 'sha1'."
         )

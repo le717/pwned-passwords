@@ -9,7 +9,7 @@ __all__ = ["has_md4", "md4"]
 
 def _no_md4_support(data: bytes, /) -> NoReturn:
     """Raise an exception when trying to use NTLM hashing without md4 hash support."""
-    raise UnsupportedAlgoError("Unsupported hashing algorithm: 'ntlm'. Available options: sha1.")
+    raise UnsupportedAlgoError("Unsupported hashing algorithm: 'ntlm'. Available options: 'sha1'.")
 
 
 def _fallback_md4(data: bytes, /) -> str:

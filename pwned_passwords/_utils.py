@@ -51,11 +51,9 @@ def generate_hash(hash_type: str, password: bytes | str, /) -> str:
 
     # We don't support the request algo, determine which ones we do support so we can provide
     # an accurate exception message
-    algos = ["sha1"]
-    if _md4.has_md4:
-        algos.append("ntlm")
+    algos = f"'sha1'{", 'ntlm'" if _md4.has_md4 else ''}".strip()
     raise UnsupportedAlgoError(
-        f"Unsupported hashing algorithm: {hash_type!r}. Available options: {', '.join(algos)}."
+        f"Unsupported hashing algorithm: {hash_type!r}. Available options: {algos}."
     )
 
 
