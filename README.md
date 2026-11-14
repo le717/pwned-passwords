@@ -38,6 +38,10 @@ If no NTLM support is available, `pwned_passwords.exceptions.UnsupportedAlgoErro
 It is recommended to stick with the SHA-1 hash default.
 
 
+### Django password validator
+TODO: write me!
+`pwned_passwords.django.PwnedPasswordsValidator`
+
 ## License
 Pwned Passwords API, created and maintained at [Have I Been Pwned](https://haveibeenpwned.com/).
 
