@@ -25,12 +25,8 @@ homepage = "https://github.com/le717/pwned-passwords"
 source = "https://github.com/le717/pwned-passwords.git"
 
 [dependency-groups]
-dev = [
-    "ruff>=0.17.5",
-    "ty>=0.0.104",
-]
+dev = ["ruff>=0.17.5", "ty>=0.0.104", "django>=6.1.3"]
 ntlm = ["pyspnego>=0.12.4"]
-django = ["django>=6.1.3"]
 
 [tool.ruff]
 indent-width = 4
