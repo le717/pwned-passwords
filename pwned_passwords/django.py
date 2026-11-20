@@ -1,5 +1,3 @@
-from typing import Literal
-
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
@@ -16,23 +14,23 @@ class PwnedPasswordsValidator:
     def __init__(
         self,
         add_padding: bool = False,
-        mode: Literal["sha1", "ntlm"] = "sha1",
+        use_ntlm: bool = False,
         get_hashes: bool = False,
         ignore_algo_error: bool = False,
     ) -> None:
         self.add_padding = add_padding
-        self.mode = mode
+        self.use_ntlm = use_ntlm
         self.get_hashes = get_hashes
         self.ignore_algo_error = ignore_algo_error
 
     def validate(self, password: str, user=None) -> None:
-        """TODO: write me!"""
+        """Check the given password against the Pwned Passwords database."""
         try:
             result = pwned_passwords.check(
                 password,
                 options=pwned_passwords.PwnedOptions(
                     add_padding=self.add_padding,
-                    mode=self.mode,  # type: ignore[reportArgumentType]
+                    mode="ntlm" if self.use_ntlm else "sha1",
                     get_hashes=self.get_hashes,
                 ),
             )
