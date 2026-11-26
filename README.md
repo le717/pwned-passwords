@@ -32,15 +32,43 @@ result: pwned_passwords.PwnedResults = pwned_passwords.check(
 print(result.hashes)  # list[pwned_passwords.PwnedHash]
 ```
 
-**Note**: NTLM hash support is dependent on platform support, with fallback support provided by
-[pyspnego](https://pypi.org/project/pyspnego/) if installed with the `[ntlm]` extra group.
-If no NTLM support is available, `pwned_passwords.exceptions.UnsupportedAlgoError` will be raised.
-It is recommended to stick with the SHA-1 hash default.
-
-
 ### Django password validator
-TODO: write me!
-`pwned_passwords.django.PwnedPasswordsValidator`
+A [Django password validator](https://docs.djangoproject.com/en/6.1/topics/auth/passwords/#module-django.contrib.auth.password_validation)
+is provided to assist with integration pwned-passwords into your Django project.
+
+```py
+# In settings.py
+
+AUTH_PASSWORD_VALIDATORS = [
+    # ... The rest of your validators
+    {
+        "NAME": "pwned_passwords.django.PwnedPasswordsValidator",
+        "OPTIONS": {
+            "add_padding": False  # bool, default: False
+            "mode": "sha-1", # str, "sha-1" | "ntlm", default: "sha-1"
+            "get_hashes": False,  # bool, default: False
+            "ignore_algo_error": False  # bool, default: False
+        }
+    },
+]
+```
+
+The optional configuration keys follow the library configuration defaults.
+
+Setting the `ignore_algo_error` option to `True` causes the validator to ignore an
+`pwned_passwords.exceptions.UnsupportedAlgoError` exception and pass the password (fail-open).
+
+### NTLM support
+NTLM hash support is dependent on platform support. By default, Python's `hashlib` module will be
+used if provided by the platform.
+
+The `[ntlm]` install group can be used to guarantee NTLM hash support. This is enabled using
+[pyspnego](https://pypi.org/project/pyspnego/).
+
+If no NTLM support is available but that hash format is specified, an
+`pwned_passwords.exceptions.UnsupportedAlgoError` exception will be raised.
+
+It is strongly recommended to stick with the SHA-1 hash default.
 
 ## License
 Pwned Passwords API, created and maintained at [Have I Been Pwned](https://haveibeenpwned.com/).
